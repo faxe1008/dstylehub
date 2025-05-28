@@ -1,0 +1,98 @@
+name: Build Darktable
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  pages: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            libjpeg-dev \
+            libtiff-dev \
+            liblcms2-dev \
+            libsqlite3-dev \
+            libcurl4-openssl-dev \
+            libxml2-dev \
+            libxslt1-dev \
+            intltool \
+            libglib2.0-dev \
+            libgphoto2-dev \
+            libexiv2-dev \
+            libwebp-dev \
+            libgraphicsmagick1-dev \
+            libopenexr-dev \
+            libcolord-dev \
+            libjson-glib-dev \
+            libsecret-1-dev \
+            libgtk-3-dev \
+            liblensfun-dev \
+            liblua5.3-dev \
+            libpugixml-dev \
+            libboost-dev \
+            libboost-filesystem-dev \
+            libboost-program-options-dev \
+            libboost-iostreams-dev \
+            libboost-serialization-dev \
+            libboost-system-dev \
+            libboost-thread-dev \
+            libboost-test-dev \
+            python3 \
+            python3-jsonschema \
+            xsltproc \
+            libxml2-utils \
+            librsvg2-dev
+
+      - name: Checkout darktable fork
+        uses: actions/checkout@v4
+        with:
+          repository: faxe1008/darktable
+          ref: apply_style_from_file
+          submodules: 'recursive'
+          path: darktable
+
+      - name: Build Darktable
+        run: |
+          cd darktable
+          ./build.sh --prefix /usr --build-type Release --install --sudo
+
+      - name: Checkout dstylehub repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.workspace }}/dstylehub
+
+      - name: Generate Previews from Repository Root
+        run: |
+          cd ${{ github.workspace }}/dstylehub
+          darktable-cli --version
+          mkdir dstylehub_preview
+          pip3 install -r requirements.txt
+          python3 src/main.py --style-folder styles --base-images-folder images --output-folder dstylehub_preview
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ github.workspace }}/dstylehub/dstylehub_preview
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

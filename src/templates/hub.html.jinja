@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Darktable Style Hub</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script>
+    // enable dark mode based on user’s OS preference
+    tailwind.config = {
+      darkMode: 'media',
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const favoriteStyles = JSON.parse(localStorage.getItem('favoriteStyles') || '[]');
+      let activeFilters = [];
+
+      // Initialize favorite icons
+      favoriteStyles.forEach(style => {
+        const star = document.querySelector(`[data-style="${style}"] .favorite-star svg`);
+        if (star) {
+          star.classList.add('text-yellow-500');
+          star.setAttribute('fill', 'currentColor');
+        }
+      });
+
+      // Toggle favorite on star click
+      document.querySelectorAll('.favorite-star').forEach(star => {
+        star.addEventListener('click', () => {
+          const styleName = star.dataset.style;
+          const svg = star.querySelector('svg');
+          if (favoriteStyles.includes(styleName)) {
+            favoriteStyles.splice(favoriteStyles.indexOf(styleName), 1);
+            svg.classList.remove('text-yellow-500');
+            svg.setAttribute('fill', 'none');
+          } else {
+            favoriteStyles.push(styleName);
+            svg.classList.add('text-yellow-500');
+            svg.setAttribute('fill', 'currentColor');
+          }
+          localStorage.setItem('favoriteStyles', JSON.stringify(favoriteStyles));
+          applyFilters();
+        });
+      });
+
+      // Apply filters
+      const applyFilters = () => {
+        document.querySelectorAll('.style-section').forEach(section => {
+          const styleName = section.dataset.style;
+          const isFavorite = favoriteStyles.includes(styleName);
+          const showSection = activeFilters.length === 0 ||
+            (activeFilters.includes('favorites') && isFavorite);
+          section.style.display = showSection ? '' : 'none';
+        });
+      };
+
+      // Filter logic
+      document.querySelectorAll('.filter-button').forEach(button => {
+        button.addEventListener('click', () => {
+          const filter = button.dataset.filter;
+          if (activeFilters.includes(filter)) {
+            activeFilters = activeFilters.filter(f => f !== filter);
+          } else {
+            activeFilters.push(filter);
+          }
+
+          document.querySelectorAll('.filter-button').forEach(btn => {
+            btn.classList.toggle('bg-blue-600', activeFilters.includes(btn.dataset.filter));
+            btn.classList.toggle('text-white', activeFilters.includes(btn.dataset.filter));
+            btn.classList.toggle('font-bold', activeFilters.includes(btn.dataset.filter));
+            btn.classList.toggle('bg-gray-200', !activeFilters.includes(btn.dataset.filter));
+            btn.classList.toggle('text-gray-800', !activeFilters.includes(btn.dataset.filter));
+            btn.classList.toggle('font-normal', !activeFilters.includes(btn.dataset.filter));
+          });
+
+          applyFilters();
+        });
+      });
+
+      // Initial filter application
+      applyFilters();
+    });
+  </script>
+</head>
+
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+  <div class="container mx-auto p-6">
+    <!-- Filter Section -->
+    <section class="mb-6">
+      <div class="flex justify-end space-x-4">
+        <button class="filter-button bg-gray-200 text-gray-800 px-4 py-2 rounded" data-filter="favorites">Favorites</button>
+        <!-- Future filters can be added here -->
+      </div>
+    </section>
+
+    <section>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for img in base_images %}
+          <div class="overflow-hidden rounded-lg shadow">
+            <img src="{{ img }}" alt="Original image {{ loop.index }}" class="w-full h-auto object-cover">
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% for style_name, images in styles.items() %}
+    <section class="mt-12 style-section" data-style="{{ style_name }}">
+      <div class="flex items-center mb-4">
+        <h2 class="text-2xl font-semibold">{{ style_name }}</h2>
+        <button class="ml-2 favorite-star text-gray-400 hover:text-yellow-500" data-style="{{ style_name }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15 8.5 22 9 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9 9 8.5 12 2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for img in images %}
+          <div class="overflow-hidden rounded-lg shadow-lg">
+            <img src="{{ img }}" alt="{{ style_name }} image {{ loop.index }}" class="w-full h-auto object-cover">
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</body>
+</html>
