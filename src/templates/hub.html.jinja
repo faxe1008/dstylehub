@@ -108,9 +108,9 @@
     </section>
 
     <section>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="flex flex-wrap gap-4">
         {% for img in base_images %}
-          <div class="overflow-hidden rounded-lg shadow">
+          <div class="flex-grow basis-[calc(100%/4)] sm:basis-[calc(100%/2)] md:basis-[calc(100%/3)] lg:basis-[calc(100%/4)] overflow-hidden rounded-lg shadow">
             <img src="{{ img }}" alt="Original image {{ loop.index }}" class="w-full h-auto object-cover">
           </div>
         {% endfor %}
@@ -127,9 +127,9 @@
           </svg>
         </button>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="flex flex-wrap gap-4">
         {% for img in images %}
-          <div class="overflow-hidden rounded-lg shadow-lg">
+          <div class="flex-grow basis-[calc(100%/4)] sm:basis-[calc(100%/2)] md:basis-[calc(100%/3)] lg:basis-[calc(100%/4)] overflow-hidden rounded-lg shadow-lg">
             <img src="{{ img }}" alt="{{ style_name }} image {{ loop.index }}" class="w-full h-auto object-cover">
           </div>
         {% endfor %}
