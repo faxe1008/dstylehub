@@ -28,6 +28,7 @@ class Darkroom:
         image_path: Path,
         output_base: Path,
         style: Optional[DarktableStyle] = None,
+        width: int = 1920,
         quality: int = 80,
     ) -> Path:
         """
@@ -47,6 +48,8 @@ class Darkroom:
             [
                 "--out-ext",
                 "jpeg",
+                "--width",
+                str(width),
                 "--core",
                 "--conf",
                 f"plugins/imageio/format/jpeg/quality={quality}",
