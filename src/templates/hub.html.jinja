@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Darktable Style Hub</title>
 
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.png" type="image/png">
+
   <!-- Tailwind CSS via CDN -->
   <script>
     // enable dark mode based on user’s OS preference
@@ -90,9 +93,17 @@
   <div class="container mx-auto p-6">
     <!-- Filter Section -->
     <section class="mb-6">
-      <div class="flex justify-end space-x-4">
-        <button class="filter-button bg-gray-200 text-gray-800 px-4 py-2 rounded" data-filter="favorites">Favorites</button>
-        <!-- Future filters can be added here -->
+      <div class="flex justify-between items-center">
+        <!-- Site Name and Logo -->
+        <div class="flex items-center space-x-4">
+          <img src="favicon_large.png" alt="Site Logo" class="h-10 w-10">
+          <h1 class="text-2xl font-bold">Darktable Style Hub</h1>
+        </div>
+        <!-- Filter Buttons -->
+        <div class="flex space-x-4">
+          <button class="filter-button bg-gray-200 text-gray-800 px-4 py-2 rounded" data-filter="favorites">Favorites</button>
+          <!-- Future filters can be added here -->
+        </div>
       </div>
     </section>
 

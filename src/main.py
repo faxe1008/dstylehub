@@ -55,7 +55,9 @@ class Darkroom:
                 f"plugins/imageio/format/jpeg/quality={quality}",
             ]
         )
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
         return output_base.with_suffix(".jpg")
 
 
@@ -99,7 +101,7 @@ def main():
         base_name = img.stem
         output_base = args.output_folder / get_output_base_name(base_name)
         print(f"Developing base image: {img.name}")
-        output_file = Darkroom.develop(img, output_base, quality=80)
+        output_file = Darkroom.develop(img, output_base, quality=70)
         developed_base.append(output_file.name)
 
     # Apply styles
@@ -110,7 +112,7 @@ def main():
             base_name = img.stem
             output_base = args.output_folder / get_output_base_name(base_name, style)
             print(f"Applying style '{style.name}' to {img.name}")
-            output_file = Darkroom.develop(img, output_base, style=style, quality=80)
+            output_file = Darkroom.develop(img, output_base, style=style, quality=70)
             results.append(output_file.name)
         style_results[style.name] = results
 
@@ -121,6 +123,13 @@ def main():
     html = template.render(base_images=developed_base, styles=style_results)
     index_file = args.output_folder / "index.html"
     index_file.write_text(html, encoding="utf-8")
+
+    # Copy favicon from templates to output folder
+    static_files = ["favicon.png", "favicon_large.png"]
+    for static_file in static_files:
+        src = templates_dir / static_file
+        dest = args.output_folder / static_file
+        dest.write_bytes(src.read_bytes())
 
 
 if __name__ == "__main__":
