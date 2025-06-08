@@ -106,6 +106,7 @@ def main():
 
     # Apply styles
     style_results = {}
+    style_download_links = {}
     for style in styles:
         results = []
         for img in base_images:
@@ -116,11 +117,20 @@ def main():
             results.append(output_file.name)
         style_results[style.name] = results
 
+        # Copy the style file to the output folder
+        style_path = args.output_folder / style.path.name
+        style_path.write_bytes(style.path.read_bytes())
+        style_download_links[style.name] = f"https://faxe1008.github.io/dstylehub/{style.path.name}"
+
     # Render HTML
     templates_dir = Path(__file__).parent / "templates"
     env = Environment(loader=FileSystemLoader(str(templates_dir)))
     template = env.get_template("hub.html.jinja")
-    html = template.render(base_images=developed_base, styles=style_results)
+    html = template.render(
+        base_images=developed_base,
+        styles=style_results,
+        style_download_links=style_download_links,
+    )
     index_file = args.output_folder / "index.html"
     index_file.write_text(html, encoding="utf-8")
 
